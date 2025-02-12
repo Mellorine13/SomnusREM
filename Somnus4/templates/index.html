@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="favicon.ico" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Somnus REM</title>
+    <style>
+        body {
+            font-family: 'Consolas', 'Courier New', monospace;
+            background-color: #000;
+            color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        body::before {
+            content: " .              +   .                .   . .     .  .\A                   .                    .       .     *\A  .       *                        . . . .  .   .  + .\A                                  .   .  +  . . .\A.                               .  .   .    .    . .\A                              .     .     . +.    +  .\A                                .       .   . .\A        . .                  .    * . . .  .  +   .\A           +      .           .   .      +\A                            .       . +  .+. .\A  .                      .     . + .  . .     . .  .  .\A           .      .    .     . .   . . .         : \A      *                .    . .  +    .  .    - -- + --\A          .     .    .  +   . .  *  .       .   !\A               . + .  .  .  .. +  .             .\A.      .  .  .  *   .  *  . +..  .           * .\A .      .   . .   .   .   . .  +   .    .            +";
+            white-space: pre;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 44px;
+            line-height: 1.2;
+            color: #444;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .ascii-logo {
+            font-size: 18px; 
+            -webkit-user-select: none;   
+            -moz-user-select: none;       
+            -ms-user-select: none;       
+            user-select: none;            
+        }
+
+        h1, p {
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+
+        .results h2 {
+            width: 120px; 
+            text-align: center;
+            white-space: nowrap; 
+            margin: 0 auto; 
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        form {
+            height: 180px;  
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background-color: #333;
+            padding: 20px;
+            border-radius: 5px;
+            margin-right: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .radio-group {
+            margin: 15px 0;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .radio-group label {
+            margin-right: 20px;
+            font-size: 1.1em;
+            position: relative;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .radio-group input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .radio-group span {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #888;
+            border-radius: 50%;
+            margin-right: 8px;
+            transition: 0.3s;
+        }
+
+        .radio-group input:checked + span {
+            background-color: #80a192;
+            border-color: #80a192;
+            box-shadow: 0 0 5px #80a192;
+        }
+
+        label[for="time"] {
+            font-size: 1.1em;
+        }
+
+        input[type="time"] {
+            margin: 10px 0;
+            padding: 8px;
+            font-size: 1.1em;
+            border-radius: 5px;
+            border: none;
+            background-color: #222;
+            color: #fff;
+            text-align: center;
+            font-family: 'Consolas', monospace;
+        }
+
+        .results {
+            height: 190px;
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            background-color: #222;
+            padding: 16px;
+            border-radius: 5px;
+            color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .results h2 {
+            margin: 0;
+            font-size: 1.3em;
+            color: #80a192;
+        }
+
+        #output {
+            margin-top: 10px;
+            font-size: 1.1em;
+            line-height: 3;
+        }
+
+        .results.sleep-mode #output div:nth-child(3) {
+            color: #94edc5;
+        }
+
+        .results.wake-mode #output div:nth-child(3) {
+            color: #94edc5;
+        }
+        
+        .sleep-description {
+            font-family: 'Consolas', 'Courier New', monospace;
+            max-width: 800px; 
+            margin: 2rem auto;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            line-height: 1.6;
+            color: #ffffff;
+        }
+
+        .info-box-corner {
+            position: fixed;
+            line-height: normal;
+            top: 120px;
+            left: 20px;
+            margin: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 8px;
+            padding: 11px;
+            max-width: 250px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-box-corner h3 {
+            margin: 1px;       
+            color: #6c8c7c;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .info-box-corner p {
+            color: #ffffff;
+            font-size: 0.9em;
+            line-height: 1.4;
+            margin: 0;
+            opacity: 1;
+        }
+        
+        .short-description {
+            position: relative;
+            top: -20px;
+            margin: 0 auto;
+            max-width: 600px;
+            text-align: center;
+            z-index: 1;
+        }
+
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+            margin-right: 10px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #333;
+            transition: 0.4s;
+            border-radius: 34px;
+            border: 2px solid #888;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 2px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #888;
+            transition: 0.4s;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(128, 161, 146, 0);
+        }
+
+        input:checked + .slider:before {
+            background-color: #80a192;
+            box-shadow: 0 0 10px rgba(128, 161, 146, 0.6);
+            transform: translate(20px, -50%);
+        }
+
+        .toggle-label {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 1.1em;
+            color: #f0f0f0;
+            margin-left: 8px;
+        }
+
+        .preset-modal {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #80a192;
+            box-shadow: 0 0 15px rgba(128, 161, 146, 0.4);
+            z-index: 2000;
+            max-width: 300px;
+        }
+
+        .preset-modal h3 {
+            color: #80a192;
+            margin: 0 0 15px 0;
+            font-size: 1.2em;
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .preset-button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Consolas', monospace;
+            transition: opacity 0.3s;
+        }
+
+        .preset-button:hover {
+            opacity: 0.8;
+        }
+
+        #presetYes {
+            background: #80a192;
+            color: #000;
+        }
+
+        #presetNo {
+            background: #903333;
+            color: #fff;
+        }
+
+        .preset-time {
+            color: #80a192;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+</style>
+</head>
+<body>
+    
+    <div class="preset-modal" id="presetModal" style="display: none;">
+        <h3>Reuse previous sleep/wake-up time?</h3>
+        <p class="preset-time" id="presetTimeDisplay"></p>
+        <div class="preset-buttons">
+            <button class="preset-button" id="presetYes">Yes</button>
+            <button class="preset-button" id="presetNo">No</button>
+        </div>
+    </div>
+
+    <!-- ASCII Logo -->
+    <pre class="ascii-logo">
+        <td style="padding-top: 1px;"></td>
+            ______          \'/                                                
+        .-'` .    `'-.    -= * =-                                              
+      .'  '    .---.  '.    /.\                                                
+     /  '    .'     `'. \                                                      
+    ;  '    /          \|                                                      
+   :  '   _ ;           `                                                      
+  ;  :   /4\\      _____                                    ____  ________  ___
+  |  .       '.   / ___/____  ____ ___  ____  __  _______  / __ \/ ____/  |/  /
+  |  ' /     --'  \__ \/ __ \/ __ `__ \/ __ \/ / / / ___/ / /_/ / __/ / /|_/ / 
+  |  .   '.__\   ___/ / /_/ / / / / / / / / / /_/ (__  ) / _, _/ /___/ /  / /  
+  ;  :       /  /____/\____/_/ /_/ /_/_/ /_/\__,_/____/ /_/ |_/_____/_/  /_/   
+   ;  .     |            ,                                                     
+    ;  .    \           /|                                                     
+     \  .    '.       .'/                                                      
+      '.  '  . `'---'`.'                                                       
+        `'-..._____.-`                                                         
+    </pre>
+
+    <div class="info-box-corner">
+        <h3>Did You Know?</h3>
+        <p id="fun-fact"></p>
+    </div>
+
+    <!-- Facts -->
+    <script>
+        const facts = [
+            "The average person takes 15 minutes to fall asleep. This is called <span style='color: #7f9f90; font-style: italic;'>sleep latency</span> and has been accounted for in our calculations.",
+            "<span style='color: #7f9f90; font-style: italic;'>REM sleep</span> is the stage where most vivid dreaming occurs. This phase is crucial for emotional regulation and memory consolidation.",
+            "Consuming <span style='color: #7f9f90; font-style: italic;'>alcohol</span> before bed can reduce the amount of REM sleep, leading to less restorative rest and potential sleep disruptions.",
+            "Exposure to <span style='color: #7090d0; font-style: italic;'>blue light</span> from screens before bedtime can interfere with the production of melatonin, the hormone that regulates sleep, making it harder to fall asleep.",
+            "<span style='color: #7f9f90; font-style: italic;'>REM sleep</span> enhances creative problem-solving by stimulating associative networks, allowing the brain to make new and useful connections.",
+            "<span style='color: #7f9f90; font-style: italic;'>REM sleep</span> plays a significant role in consolidating procedural memory, which involves learning new skills and tasks.",
+            "Humans are the only mammals that willingly <span style='color: #7f9f90; font-style: italic;'>delay sleep</span>, often due to lifestyle choices and obligations.",
+            "Sleeping in complete <span style='color: #7f9f90; font-style: italic;'>darkness</span> boosts melatonin production, improving sleep quality and maintaining a healthy circadian rhythm."    
+        ]
+        const factElement = document.getElementById('fun-fact');
+        const randomFact = facts[Math.floor(Math.random() * facts.length)];
+        factElement.innerHTML = randomFact;
+    </script>
+    <!-- Short Description of Somnus -->
+    <div class="short-description">
+        <br>
+        <p>Calculate the best times for waking up and going to sleep based on Rapid Eye Movement cycles</p>
+        <p>The most optimal times are highlighted in green</p>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Form -->
+        <form>
+            <div class="toggle-group">
+                <label class="switch">
+                    <input type="checkbox" id="formatToggle">
+                    <span class="slider"></span>
+                </label>
+                <label for="formatToggle" class="toggle-label">24-Hour Clock</label>
+            </div>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" name="mode" value="sleep" checked>
+                    <span></span>
+                    I am going to sleep
+                </label>
+                <label>
+                    <input type="radio" name="mode" value="wake">
+                    <span></span>
+                    I am waking up
+                </label>
+            </div>
+            <label for="time">Enter Time:</label><br>
+            <input type="time" id="time" required>
+        </form>
+        <!-- Results -->
+        <div class="results">
+            <h2>Sleep Times</h2>
+            <div id="output"></div>
+        </div>
+    </div> 
+    <body>
+
+    <!-- Sleep Description Text -->
+    <div class="sleep-description">
+        <td style="padding-top: 1px;">. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . </td>
+        <h1><i>How does Somnus REM work?</i></h1>
+
+        <p>Somnus REM is a sleep cycle calculator designed to help you wake up feeling refreshed and well-rested by aligning with your Rapid Eye Movement (REM) sleep cycles. Sleep occurs in cycles, each lasting about 90 minutes, and waking up in the middle of a cycle can leave you feeling groggy and tired.</p>
+
+        <p>This tool allows you to:</p>
+        
+        <p><b>> Find the best times to wake up if you're going to sleep now.</b></p>
+        
+        <p><b>> Determine when to go to bed if you need to wake up at a specific time.</b></p>
+        
+        <p>By waking up at the end of a sleep cycle (instead of in the middle), you'll experience a smoother, more natural awakening, leaving you energized and alert. Just enter your desired time, and the calculator will suggest optimal wake-up or sleep times based on the 4th to 6th sleep cycles—ideal for quality rest!</p>
+        <td style="padding-top: 1px;">. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . </td>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+    // Existing variables
+    const timeInput = document.getElementById('time');
+    const outputContainer = document.getElementById('output');
+    const modeRadios = document.querySelectorAll('input[name="mode"]');
+    const resultsHeading = document.querySelector('.results h2');
+    const formatToggle = document.getElementById('formatToggle');
+
+    function parseTimeInput(timeString) {
+        let [hours, minutes] = timeString.split(':').map(Number);
+        const baseDate = new Date();
+        baseDate.setHours(hours, minutes, 0);
+        return baseDate;
+    }
+    
+    function calculateWakeTimes(sleepTime) {
+        const results = [];
+        sleepTime = new Date(sleepTime.getTime() + 15 * 60000); // Add 15 minutes for sleep latency
+        for (let i = 4; i <= 6; i++) {
+            const time = new Date(sleepTime.getTime() + i * 90 * 60000);
+            results.push(formatTime(time));
+        }
+        return results;
+    }
+
+    function calculateSleepTimes(wakeTime) {
+        const results = [];
+        wakeTime = new Date(wakeTime.getTime() + 15 * 60000); // Add 15 minutes for sleep latency
+        for (let i = 4; i <= 6; i++) {
+            const time = new Date(wakeTime.getTime() - i * 90 * 60000);
+            results.push(formatTime(time));
+        }
+        return results;
+    }
+
+    // New preset functionality variables
+    const presetModal = document.getElementById('presetModal');
+    const presetTimeDisplay = document.getElementById('presetTimeDisplay');
+    let storedPreset = JSON.parse(localStorage.getItem('sleepPreset'));
+
+    // Check for preset on load
+    if (storedPreset) {
+        presetModal.style.display = 'block';
+        presetTimeDisplay.textContent = `${storedPreset.time} (${storedPreset.mode === 'sleep' ? 'Sleep' : 'Wake'})`;
+    }
+
+    // Preset button handlers
+    document.getElementById('presetNo').addEventListener('click', () => {
+        presetModal.style.display = 'none';
+        localStorage.removeItem('sleepPreset');
+    });
+
+    document.getElementById('presetYes').addEventListener('click', () => {
+        presetModal.style.display = 'none';
+        document.querySelector(`input[value="${storedPreset.mode}"]`).checked = true;
+        timeInput.value = storedPreset.time;
+        updateResults();
+    });
+
+    // Modified formatTime function to handle input
+    function formatTime(date, hour12 = !formatToggle.checked) {
+        return date.toLocaleTimeString([], { 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            hour12: hour12 
+        });
+    }
+
+    // New function to handle time input format
+    function updateTimeInputFormat() {
+        if (timeInput.value) {
+            const [hours, minutes] = timeInput.value.split(':');
+            const date = new Date();
+            date.setHours(hours, minutes);
+            timeInput.value = formatTime(date, !formatToggle.checked).replace(/ /g, '');
+        }
+    }
+
+    // Modified updateResults function to store preset
+    function updateResults() {
+        const selectedMode = document.querySelector('input[name="mode"]:checked').value;
+        const inputTime = timeInput.value;
+
+        // Store preset
+        if (inputTime) {
+            localStorage.setItem('sleepPreset', JSON.stringify({
+                mode: selectedMode,
+                time: inputTime
+            }));
+        }
+
+        // Rest of existing updateResults logic...
+        document.querySelector('.results').className = `results ${selectedMode}-mode`;
+        resultsHeading.textContent = selectedMode === 'sleep' ? 'Wake-Up At' : 'Sleep At';
+
+        if (!inputTime) {
+            outputContainer.innerHTML = '';
+            return;
+        }
+
+        const parsedTime = parseTimeInput(inputTime);
+        let results = selectedMode === 'sleep' 
+            ? calculateWakeTimes(parsedTime)
+            : calculateSleepTimes(parsedTime);
+
+        outputContainer.innerHTML = results.map(time => `<div>${time}</div>`).join('');
+    }
+
+    // Update time input format when toggle changes
+    formatToggle.addEventListener('change', () => {
+        updateTimeInputFormat();
+        updateResults();
+    });
+
+    // Initial setup
+    if (storedPreset) {
+        timeInput.value = storedPreset.time;
+        updateTimeInputFormat();
+    }
+
+    // Rest of existing event listeners...
+    timeInput.addEventListener('input', updateResults);
+    modeRadios.forEach(radio => radio.addEventListener('change', updateResults));
+    updateResults();
+})
+</script>
+</body>
+</html>
