@@ -335,7 +335,7 @@
         </div>
     </div>
 
-    <!-- ASCII Logo -->
+    <!-- logo -->
     <pre class="ascii-logo">
         <td style="padding-top: 1px;"></td>
             ______          \'/                                                
@@ -361,7 +361,7 @@
         <p id="fun-fact"></p>
     </div>
 
-    <!-- Facts -->
+    <!-- facts -->
     <script>
         const facts = [
             "The average person takes 15 minutes to fall asleep. This is called <span style='color: #7f9f90; font-style: italic;'>sleep latency</span> and has been accounted for in our calculations.",
@@ -377,16 +377,15 @@
         const randomFact = facts[Math.floor(Math.random() * facts.length)];
         factElement.innerHTML = randomFact;
     </script>
-    <!-- Short Description of Somnus -->
+    <!-- somnus short description -->
     <div class="short-description">
         <br>
         <p>Calculate the best times for waking up and going to sleep based on Rapid Eye Movement cycles</p>
         <p>The most optimal times are highlighted in green</p>
     </div>
 
-    <!-- Main Container -->
     <div class="container">
-        <!-- Form -->
+        <!-- radio buttons -->
         <form>
             <div class="toggle-group">
                 <label class="switch">
@@ -410,7 +409,7 @@
             <label for="time">Enter Time:</label><br>
             <input type="time" id="time" required>
         </form>
-        <!-- Results -->
+        <!-- results -->
         <div class="results">
             <h2>Sleep Times</h2>
             <div id="output"></div>
@@ -418,7 +417,7 @@
     </div> 
     <body>
 
-    <!-- Sleep Description Text -->
+    <!-- sleep description text -->
     <div class="sleep-description">
         <td style="padding-top: 1px;">. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . </td>
         <h1><i>How does Somnus REM work?</i></h1>
@@ -454,7 +453,7 @@
     
     function calculateWakeTimes(sleepTime) {
         const results = [];
-        sleepTime = new Date(sleepTime.getTime() + 15 * 60000); // Add 15 minutes for sleep latency
+        sleepTime = new Date(sleepTime.getTime() + 15 * 60000); // add 15 minutes for sleep latency
         for (let i = 4; i <= 6; i++) {
             const time = new Date(sleepTime.getTime() + i * 90 * 60000);
             results.push(formatTime(time));
@@ -464,7 +463,7 @@
 
     function calculateSleepTimes(wakeTime) {
         const results = [];
-        wakeTime = new Date(wakeTime.getTime() + 15 * 60000); // Add 15 minutes for sleep latency
+        wakeTime = new Date(wakeTime.getTime() + 15 * 60000); // add 15 minutes for sleep latency
         for (let i = 4; i <= 6; i++) {
             const time = new Date(wakeTime.getTime() - i * 90 * 60000);
             results.push(formatTime(time));
@@ -477,13 +476,13 @@
     const presetTimeDisplay = document.getElementById('presetTimeDisplay');
     let storedPreset = JSON.parse(localStorage.getItem('sleepPreset'));
 
-    // Check for preset on load
+    // check for preset on load
     if (storedPreset) {
         presetModal.style.display = 'block';
         presetTimeDisplay.textContent = `${storedPreset.time} (${storedPreset.mode === 'sleep' ? 'Sleep' : 'Wake'})`;
     }
 
-    // Preset button handlers
+    // handle preset buttons
     document.getElementById('presetNo').addEventListener('click', () => {
         presetModal.style.display = 'none';
         localStorage.removeItem('sleepPreset');
@@ -496,7 +495,7 @@
         updateResults();
     });
 
-    // Modified formatTime function to handle input
+    // handle time input
     function formatTime(date, hour12 = !formatToggle.checked) {
         return date.toLocaleTimeString([], { 
             hour: '2-digit', 
@@ -505,7 +504,7 @@
         });
     }
 
-    // New function to handle time input format
+    // handle time input format
     function updateTimeInputFormat() {
         if (timeInput.value) {
             const [hours, minutes] = timeInput.value.split(':');
@@ -515,12 +514,12 @@
         }
     }
 
-    // Modified updateResults function to store preset
+    
     function updateResults() {
         const selectedMode = document.querySelector('input[name="mode"]:checked').value;
         const inputTime = timeInput.value;
 
-        // Store preset
+        // store presets
         if (inputTime) {
             localStorage.setItem('sleepPreset', JSON.stringify({
                 mode: selectedMode,
@@ -528,7 +527,7 @@
             }));
         }
 
-        // Rest of existing updateResults logic...
+        // if sleep then this if wake then that
         document.querySelector('.results').className = `results ${selectedMode}-mode`;
         resultsHeading.textContent = selectedMode === 'sleep' ? 'Wake-Up At' : 'Sleep At';
 
@@ -545,19 +544,19 @@
         outputContainer.innerHTML = results.map(time => `<div>${time}</div>`).join('');
     }
 
-    // Update time input format when toggle changes
+    // time input toggle 
     formatToggle.addEventListener('change', () => {
         updateTimeInputFormat();
         updateResults();
     });
 
-    // Initial setup
+    // load preset  
     if (storedPreset) {
         timeInput.value = storedPreset.time;
         updateTimeInputFormat();
     }
-
-    // Rest of existing event listeners...
+    
+    
     timeInput.addEventListener('input', updateResults);
     modeRadios.forEach(radio => radio.addEventListener('change', updateResults));
     updateResults();
